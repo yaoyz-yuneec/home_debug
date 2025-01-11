@@ -1,11 +1,19 @@
-# 这段代码实现了一个具有调参界面和实时显示功能的PID控制器。在GUI界面中，可以通过滑动条调节PID参数，实时更新控制器的输出波形。
-# 在实时显示的波形图中，可以观察PID控制器输出信号随时间的变化。
-# 通过调节滑动条，可以实时调整PID参数，并观察控制效果的变化。
+# 通过将滑动条对象作为参数传递给更新函数update，可以解决无法访问滑动条对象的问题。
+# 这样更新函数就能够正确获取滑动条的值，并实现实时更新波形的功能。
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 import tkinter as tk
 from tkinter import Scale
+
+import matplotlib
+matplotlib.use('Qt5Agg')
+# 如果安装PyQt5或PySide2后仍然出现问题，您可以尝试使用其他Matplotlib后端，比如TkAgg 或者 WXAgg。
+# 只需将matplotlib.use('Qt5Agg')改为
+# matplotlib.use('TkAgg')
+#或
+#matplotlib.use('WXAgg')
+
 
 # 初始化参数
 Kp = 1.0
@@ -33,11 +41,11 @@ scale_Kd.pack()
 # 创建画布用于实时显示波形
 fig, ax = plt.subplots()
 line, = ax.plot([], [])
-ax.set_xlim(0, 10)
+ax.set_xlim(0, 20)
 ax.set_ylim(-5, 5)
 
 # 更新函数，用于实时更新波形
-def update(frame):
+def update(frame, scale_Kp, scale_Ki, scale_Kd):
     global Kp, Ki, Kd
     Kp = scale_Kp.get()
     Ki = scale_Ki.get()
@@ -66,7 +74,7 @@ def update(frame):
     return line,
 
 # 创建动画
-ani = FuncAnimation(fig, update, frames=200, interval=50, blit=True)
+ani = FuncAnimation(fig, update, fargs=(scale_Kp, scale_Ki, scale_Kd), frames=200, interval=50, blit=False)
 
 # 启动GUI界面
 tk.mainloop()
